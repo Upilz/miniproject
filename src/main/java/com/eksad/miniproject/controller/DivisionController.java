@@ -16,46 +16,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eksad.miniproject.RepositoryDAO.DivisionRepositoryDao;
 import com.eksad.miniproject.model.Division;
+import com.eksad.miniproject.service.DivisionService;
 
 @RestController
 @RequestMapping("/division")
 public class DivisionController {
+	
+	
 	@Autowired
-	DivisionRepositoryDao divisionDao;
+	private DivisionService divisionService;
 	
 	//GetAll
 	@GetMapping("getAll")
-	public List<Division> getAll(){
-		List<Division> result = new ArrayList<>();
-		divisionDao.findAll().forEach(result::add);
-		return result;
-	}
-	//Save-Insert-Delete
-	@PostMapping(value="save")
-	public Division save (@RequestBody Division division)
+	public List<Division> getAllDivisions()
 	{
-		return divisionDao.save(division);
-	}
-	@PutMapping("update/{id}")
-	public Division update (@RequestBody Division division, @PathVariable Long id) {
-		Division divisionselected = divisionDao.findById(id).orElse(null);
-		if(divisionselected != null)
-		{
-			divisionselected.setName(division.getName());
-			return divisionDao.save(divisionselected);
-		}
-		else {
-			return null;
-		}
-	}
-	@DeleteMapping("delete/{id}")
-	public HashMap<String, Object> delete (@PathVariable Long id)
-	{
-		HashMap<String, Object> result = new HashMap<String, Object>();
-		divisionDao.deleteById(id);
-		result.put("message", "delete data successfully");
-		return result;
+		return divisionService.getAllDivisions();
 	}
 	
+	@PostMapping("save")
+	public Division save(@RequestBody Division division)
+	{
+		return divisionService.save(division);
+	}
+	
+	@PutMapping("update/{id}")
+	public Division update (@RequestBody Division division, @PathVariable Long id)
+	{
+		return divisionService.update(division, id);
+	}
+	
+	@DeleteMapping("delete/{id}")
+	public HashMap<String, Object> delete (@RequestBody Division division, @PathVariable Long id)
+	{
+		return divisionService.delete(division, id);
+	}
 
 }

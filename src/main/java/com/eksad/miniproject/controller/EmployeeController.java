@@ -16,55 +16,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eksad.miniproject.RepositoryDAO.EmployeeRepositoryDao;
 import com.eksad.miniproject.model.Employee;
+import com.eksad.miniproject.service.EmployeeService;
 
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
 	@Autowired
-	EmployeeRepositoryDao employeeDao;
+	private EmployeeService employeeService;
 	
-	//GetAll
 	@GetMapping("getAll")
-	public List<Employee> getAll(){
-		List<Employee> result = new ArrayList<>();
-		employeeDao.findAll().forEach(result::add);
-		return result;
-	}
-	//SAVE-INSERT-DELETE
-	@PostMapping(value= "save")
-	public Employee save (@RequestBody Employee employee)
+	public List<Employee> getAllEmployees()
 	{
-		return employeeDao.save(employee);
+		return employeeService.getAllEmployees();
 	}
-	@DeleteMapping("delete/{id}")
-	public HashMap<String, Object> delete (@PathVariable Long id)
+	@PostMapping("save")
+	public Employee save(@RequestBody Employee employee)
 	{
-		HashMap<String, Object> result = new HashMap<String, Object>();
-		employeeDao.deleteById(id);
-		result.put("message","succesfully delete");
-		return result;
+		return employeeService.save(employee);
 	}
 	@PutMapping("update/{id}")
 	public Employee update (@RequestBody Employee employee, @PathVariable Long id)
 	{
-		Employee employeeSelected = employeeDao.findById(id).orElse(null);
-		if(employeeSelected != null)
-		{
-			employeeSelected.setName(employee.getName());
-			employeeSelected.setDob(employee.getDob());
-			employeeSelected.setAddress(employee.getAddress());
-			employeeSelected.setPhone(employee.getPhone());
-			employeeSelected.setAge(employee.getAge());
-			employeeSelected.setPob(employee.getPob());
-			employeeSelected.setId_salary(employee.getId_salary());;
-			employeeSelected.setId_div(employee.getId_div());
-			
-			return employeeDao.save(employeeSelected);
-		}
-		else {
-			return null;
-		}
+		return employeeService.update(employee, id);
 	}
-	
+	@DeleteMapping("delete/{id}")
+	public HashMap<String, Object> delete (@RequestBody Employee employee, @PathVariable Long id)
+	{
+		return employeeService.delete(employee, id);
+	}
 
 }
