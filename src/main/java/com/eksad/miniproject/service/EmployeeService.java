@@ -1,11 +1,16 @@
 package com.eksad.miniproject.service;
 
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.eksad.miniproject.RepositoryDAO.EmployeeRepositoryDao;
 import com.eksad.miniproject.model.Employee;
@@ -15,13 +20,20 @@ public class EmployeeService {
 	
 	@Autowired
 	private EmployeeRepositoryDao employeeDao;
-
-	public List<Employee> getAllEmployees()
+	
+	
+	public List<Employee> getAllEmployees() 
 	{
+		
 		List<Employee> result = new ArrayList<>();
 		employeeDao.findAll().forEach(result::add);
 		return result;
 	}
+	
+	public Employee getOne(Employee employee, Long id) {
+		return employeeDao.findById(id).orElse(null);
+	}
+	
 	
 	//SAVE - UPDATE -DELETE 
 	public Employee save (Employee employee)
