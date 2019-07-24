@@ -10,55 +10,40 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 import com.eksad.miniproject.RepositoryDAO.DivisionRepositoryDao;
 import com.eksad.miniproject.model.Division;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Service
+@Slf4j
 public class DivisionService {
 
 	@Autowired
 	private DivisionRepositoryDao  divisionDao;
-	
-	@Retryable(value = {Exception.class,NumberFormatException.class, NullPointerException.class}, maxAttempts = 3,backoff = @Backoff(10000))
-	public List<Division> getAllDivisions()
-	{
-		System.out.println("My API is Calling...");
-//		String str = null ;
-//			str.length();
-//		Integer.parseInt("");
-			
-		List<Division> result = new ArrayList<>();
-		divisionDao.findAll().forEach(result::add);
-		return result;
-		
+	@Recover
+	public void recover(NumberFormatException ex)
+	{	
+		log.error("Recover Method-Number Format Exception: {}", ex.getMessage());	
 	}
 	
 	@Recover
-	public List<Division> recover(NumberFormatException ex)
+	public void recover(NullPointerException ex)
 	{
-		System.out.println("Recover Method - Number Format   Exception");
-		List<Division> result = new ArrayList<>();
-		divisionDao.findAll().forEach(result::add);
-		return result;
-	}
-	
-	@Recover
-	public List<Division> recover(NullPointerException ex)
-	{
-		System.out.println("Recover Method - Null Pointer   Exception");
-		List<Division> result = new ArrayList<>();
-		divisionDao.findAll().forEach(result::add);
-		return result;
+		log.error("Recover Method-Null Format Exception:: {}", ex.getMessage());
 	}
 	
 	@Recover 
-	public List<Division> recover(Exception e)
+	public void recover(Exception e)
 	{
-		System.out.println("Recover Method - Exception Class");
+		log.error("Recover Method-Exception:: {}", e.getMessage());
+	}
+
+	public List<Division> getAllDivisions()
+	{
 		List<Division> result = new ArrayList<>();
 		divisionDao.findAll().forEach(result::add);
 		return result;
@@ -66,21 +51,29 @@ public class DivisionService {
 	
 	public Division getOne (Division division, Long id)
 	{
-		System.out.println("My API is Calling...");
 		return divisionDao.findById(id).orElse(null);
 	}
 
-	
-	
-	
 	//SAVE- UPDATE - DELETE
+	
+	@Retryable(value = {Exception.class,NumberFormatException.class, NullPointerException.class}, maxAttempts = 3,backoff = @Backoff(5000))
 	public Division save(Division division)
 	{
+		System.out.println("MiniProjects is Calling...");
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
 		return divisionDao.save(division);
 	}
 	
+	@Retryable(value = {Exception.class,NumberFormatException.class, NullPointerException.class}, maxAttempts = 3,backoff = @Backoff(5000))
 	public Division update (Division division, Long id)
 	{
+
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
+		System.out.println("MiniProjects is Calling...");
 		Division divisionSelected = divisionDao.findById(id).orElse(null);
 		if( divisionSelected != null)
 		{
@@ -93,9 +86,14 @@ public class DivisionService {
 			return null;
 		}
 	}
-	
+
+	@Retryable(value = {Exception.class,NumberFormatException.class, NullPointerException.class}, maxAttempts = 3,backoff = @Backoff(5000))
 	public HashMap<String, Object> delete (Division division, Long id)
 	{
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
+		System.out.println("MiniProjects is Calling...");
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		divisionDao.deleteById(id);
 		result.put("message", "Data Succesfully Deleted!");

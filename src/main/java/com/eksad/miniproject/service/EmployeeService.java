@@ -1,26 +1,43 @@
 package com.eksad.miniproject.service;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
+import org.hibernate.annotations.common.util.impl.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.eksad.miniproject.RepositoryDAO.EmployeeRepositoryDao;
 import com.eksad.miniproject.model.Employee;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EmployeeService {
 	
 	@Autowired
 	private EmployeeRepositoryDao employeeDao;
-	
+	@Recover
+	public void recover(NullPointerException ex)
+	{
+		log.error("Recover Method-Null Pointer Exception:: {}", ex.getMessage());
+	}
+	@Recover
+	public void recover(NumberFormatException ex)
+	{
+		log.error("Recover Method-Number Format Exception:: {}\", ex.getMessage()");
+	}
+	@Recover
+	public void recover (Exception e)
+	{
+		log.error("Recover Method-Exception:: {}\", ex.getMessage()");
+	}
 	
 	public List<Employee> getAllEmployees() 
 	{
@@ -36,13 +53,25 @@ public class EmployeeService {
 	
 	
 	//SAVE - UPDATE -DELETE 
+	@Retryable(value={Exception.class,NullPointerException.class,NumberFormatException.class},
+			maxAttempts = 3, backoff = @Backoff(5000))
 	public Employee save (Employee employee)
 	{
+		System.out.println("MiniProject's is calling...");
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
 		return employeeDao.save(employee);
 	}
 	
+	@Retryable(value={Exception.class,NullPointerException.class,NumberFormatException.class},
+			maxAttempts = 3, backoff = @Backoff(5000))
 	public Employee update(Employee employee, Long id)
 	{
+		System.out.println("MiniProject's is calling...");
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
 		Employee employeeSelected = employeeDao.findById(id).orElse(null);
 		if(employeeSelected != null)
 		{
@@ -62,8 +91,14 @@ public class EmployeeService {
 		}
 	}
 	
+	@Retryable(value={Exception.class,NullPointerException.class,NumberFormatException.class},
+			maxAttempts = 3, backoff = @Backoff(5000))
 	public HashMap<String, Object> delete (Employee employee, Long id)
 	{
+		System.out.println("MiniProject's is calling...");
+//		Integer.parseInt("");
+//		String str = null ;
+//		str.length();
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		employeeDao.deleteById(id);
 		result.put("message", "Data Successfully Delete");
